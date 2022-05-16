@@ -1,6 +1,3 @@
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.encoding import force_str
-from django.utils.http import urlsafe_base64_decode
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib import auth
 from apps.user.models import User
@@ -46,4 +43,21 @@ class AuthenticationLoginSerializer(serializers.ModelSerializer):
             'email': user.email,
             'tokens': user.tokens
         }
+
+
+class AuthenticationEmailSendSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(min_length=2)
+
+    class Meta:
+        model = User
+        fields = ('email',)
+
+
+class AuthenticationResetPasswordEmailSerializer(serializers.ModelSerializer):
+    uidb64 = serializers.CharField(read_only=False)
+
+    class Meta:
+        model = User
+        fields = ('uidb64', 'password')
+
 
