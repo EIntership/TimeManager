@@ -1,14 +1,12 @@
 from django.urls import path
 from rest_framework import routers
-from apps.manager.views import CompanyViewSet, GetCompanyViewSet, ProjectViewSet, GetProjectViewSet,TimeViewSet
+from apps.manager.views import CompanyViewSet, ProjectViewSet, TimeManagerViewSet, TimeDeveloperViewSet
 
 router = routers.SimpleRouter(trailing_slash=False)
-router.register(r'', CompanyViewSet, basename='company')
-router.register(r'', ProjectViewSet, basename='project')
-router.register(r'', TimeViewSet, basename='time')
-router.register(r'company', GetCompanyViewSet)
-router.register(f'project', GetProjectViewSet)
-
+router.register(r'company', CompanyViewSet, basename='company')
+router.register(r'project', ProjectViewSet, basename='project')
+router.register(r'time/manager', TimeManagerViewSet, basename='time_manager')
+router.register(r'time/developer', TimeDeveloperViewSet, basename='time_developer')
 urlpatterns = [
 
 ]

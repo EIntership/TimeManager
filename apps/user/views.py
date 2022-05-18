@@ -15,6 +15,15 @@ from apps.user.serializers import (AuthenticationRegisterSerializer,
 from django.core.mail import EmailMessage
 from rest_framework.decorators import action
 from drf_yasg.utils import swagger_auto_schema
+import environ
+import os
+
+
+# Initialise environment variables
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+env = environ.Env()
+environ.Env.read_env(env_file=str(BASE_DIR) + '/.env')
+
 # Create your views here.
 
 
@@ -43,11 +52,10 @@ class AuthenticationViewSet(ViewSet):
             print(type(user))
             if user:
                 email = EmailMessage(
-                    'Registration to TimeManager',
+                    env('EMAIL_REGISTER'),
                     f'{user.username} thank you for registration',
-                    'eugenshow83@gmail.com',
-                    [f'{user.email}'],
-
+                    env('EMAIL'),
+                    [f'{user.email}']
                 )
                 email.fail_silently = False
                 email.send()
@@ -69,7 +77,7 @@ class AuthenticationViewSet(ViewSet):
 
 class PasswordResetViewSet(ViewSet):
     http_method_names = ('get', 'patch', 'post', 'delete',)
-    #serializer_class = AuthenticationEmailSendSerializer
+    serializer_class = AuthenticationEmailSendSerializer
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     authentication_classes = ()
@@ -86,9 +94,9 @@ class PasswordResetViewSet(ViewSet):
             uidb64 = urlsafe_base64_encode(smart_bytes(user))
             if uidb64:
                 email = EmailMessage(
-                    'Reset password token',
+                   env('EMAIL_TOKEN'),
                     f'your password reset token {uidb64}',
-                    'eugenshow83@gmail.com',
+                    env('EMAIL'),
                     [f'{email}'],
                 )
                 email.fail_silently = False

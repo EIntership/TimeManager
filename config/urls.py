@@ -20,6 +20,6 @@ from config.yasg import urlpattern as url_date
 urlpatterns = [
     path('', include("apps.manager.urls"), name="manager"),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('', include("apps.user.urls"), name="authentication_page"),
+    path('user/', include("apps.user.urls"), name="authentication_page"),
 ]
 urlpatterns += url_date
