@@ -1,4 +1,4 @@
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_util.views import BaseModelViewSet
 from drf_yasg.utils import swagger_auto_schema
@@ -44,25 +44,31 @@ class ProjectViewSet(BasicModelViewSet):
     permission_classes = (AllowAny,)
     authentication_classes = ()
 
+
     @action(detail=True,
             methods=['GET'],
             permission_classes=[AllowAny],
             url_path='statistic')
     def statistic(self, request, pk=None):
-        try:
+
             serializer = self.get_serializer(Project.objects.get(id=pk))
-            return Response({'planner_hours_month_developers': self.hours(serializer.data['developer_time'][0]),
-                             'planner_hours_month_managers': self.hours(serializer.data['manager_time'][0]),
+            developer_data = TimeDeveloperSetting.objects.filter(project=pk).aggregate(Sum('day'), Sum('month'), Sum('year'))
+            print(developer_data)
+            manager_data = TimeManagerSetting.objects.filter(project=pk).aggregate(Sum('day'), Sum('month'), Sum('year'))
+            return Response({'planner_hours_month_developers': self.hours(developer_data) if self.hours(developer_data) else 0,
+                             'planner_hours_month_managers': self.hours(manager_data) if self.hours(manager_data) else 0,
                              'project': serializer.data})
-        except Exception:
-            return Response('Project matching query does not exist.')
+
 
     @staticmethod
     def hours(time):
-        hr = (time['day']*24)+(time['month']*730)+(time['year']*8765)
-        if hr >= 730:
-            return f'{hr/730} m'
-        return f'{hr} h'
+        if time['day__sum'] or time['month__sum'] or time['year__sum']:
+            hr = (time['day__sum']*24)+(time['month__sum']*730)+(time['year__sum']*8765)
+            if hr >= 730:
+                return f'{hr/730} m'
+            return f'{hr} h'
+        else:
+            return 0
 
 
 class TimeManagerViewSet(BasicModelViewSet):
