@@ -1,28 +1,19 @@
 from rest_framework.serializers import ModelSerializer
-from apps.manager.models import Company, Project, TimeManagerSetting, TimeDeveloperSetting
+from apps.manager.models import Company, Project, TimeSetting
 
 
-class TimeManagerSerializer(ModelSerializer):
-
+class TimeSerializer(ModelSerializer):
     class Meta:
-        model = TimeManagerSetting
-        fields = ('day', 'month', 'year', 'project', 'user')
-
-
-class TimeDevelopersSerializer(ModelSerializer):
-
-    class Meta:
-        model = TimeDeveloperSetting
-        fields = ('day', 'month', 'year', 'project', 'user')
+        model = TimeSetting
+        fields = ('day', 'month', 'year', 'role', 'project', 'user')
 
 
 class ProjectSerializer(ModelSerializer):
-    manager_time = TimeManagerSerializer(many=True, read_only=True)
-    developer_time = TimeDevelopersSerializer(many=True, read_only=True)
+    members = TimeSerializer(many=True, read_only=True)
 
     class Meta:
         model = Project
-        fields = ('name', 'manager_time', 'developer_time', 'company')
+        fields = ('name', 'members', 'company')
 
 
 class CompanySerializer(ModelSerializer):
