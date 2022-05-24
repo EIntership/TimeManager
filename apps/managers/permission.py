@@ -1,15 +1,18 @@
 from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated
-from apps.managers.models import TimeSetting
+from django.db.models import Q
 
 
 class IsManagerOrReadOnly(IsAuthenticated):
     def has_permission(self, request, view):
-        print(type(request.user))
-        if request.user != 'AnonymousUser':
-            pass
-            # print(TimeSetting.objects.filter(user=request.user, role='Manager'))
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return bool(request.user.groups.filter(
+            Q(name__startswith='Developer') | Q(name__startswith='Manager')))
+
+
+class IsAuthenticatedOrReadOnly(IsAuthenticated):
+    def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             return True
         return bool(request.user and request.user.is_staff)
-

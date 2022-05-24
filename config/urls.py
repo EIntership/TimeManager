@@ -15,10 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .yasg import urlpattern as url_date
+from .yasg import urlpatterns as url_date
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include("apps.users.urls"), name="authentication_page"),
     path('', include("apps.managers.urls"), name=""),
 ]
-urlpatterns+=url_date
+urlpatterns += url_date
