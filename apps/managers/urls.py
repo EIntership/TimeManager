@@ -7,5 +7,5 @@ router.register(r'project', ProjectViewSet, basename='project')
 router.register(r'time', TimeManagerViewSet, basename='time')
 
 urlpatterns = [
- *router.urls
+    *router.urls
 ]
