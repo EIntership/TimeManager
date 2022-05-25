@@ -9,10 +9,6 @@ from apps.managers.serializers import CompanySerializer, ProjectSerializer, Time
 from apps.managers.models import Company, Project, TimeSetting
 from apps.managers.permission import IsManagerOrReadOnly, IsAuthenticatedOrReadOnly
 
-# Create your views here.
-
-
-# BasicModelViewSet
 
 class BasicModelViewSet(BaseModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -22,17 +18,11 @@ class BasicModelViewSet(BaseModelViewSet):
     ordering = ['-id', ]
 
 
-# Company
-
-
 class CompanyViewSet(BasicModelViewSet):
     http_method_names = ('get', 'post', 'delete',)
     serializer_class = CompanySerializer
     queryset = Company.objects.all()
     permission_classes = [IsAuthenticatedOrReadOnly]
-
-
-# Project
 
 
 class ProjectViewSet(BasicModelViewSet):
@@ -42,21 +32,20 @@ class ProjectViewSet(BasicModelViewSet):
 
     @action(detail=True,
             methods=['GET'],
-            permission_classes=[AllowAny],
+            permission_classes=[IsManagerOrReadOnly],
             url_path='statistic')
     def statistic(self, request, pk=None):
-        statistics = TimeSetting.objects.filter(project=pk).values('role').annotate(Day=Sum('day'), Month=Sum('month'),
-                                                                                    Year=Sum('year'))
+        statistics = TimeSetting.objects.filter(project=pk).values('user__groups__name').annotate(Day=Sum('day'), Month=Sum('month'),
+                                                                                                  Year=Sum('year'))
         return Response({'statistics': statistics})
 
     @action(detail=False,
             methods=['GET'],
-            permission_classes=[AllowAny],
+            permission_classes=(IsManagerOrReadOnly, AllowAny),
             url_path='statistic')
     def statistic_all(self, request):
-        print(request.data)
-        statistics = TimeSetting.objects.filter().values('role').annotate(Day=Sum('day'), Month=Sum('month'),
-                                                                          Year=Sum('year'))
+        statistics = TimeSetting.objects.filter().values('user__groups__name').annotate(Day=Sum('day'), Month=Sum('month'),
+                                                                                        Year=Sum('year'))
         return Response({'statistics': statistics})
 
 

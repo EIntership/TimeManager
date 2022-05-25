@@ -1,26 +1,21 @@
-# Create your views here.
-import os
-import re
+import uuid
 from copy import deepcopy
-from django.db import IntegrityError
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
-from django.utils.encoding import smart_bytes
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from rest_framework import status
+from apps.users.models import UserToken
 from drf_util.decorators import serialize_decorator
 from drf_yasg.utils import swagger_auto_schema
-import environ
+from config.settings import env
 from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
-
-from apps.users.serializers import UserSerializer, AuthenticationEmailSendSerializer, AuthenticationResetPasswordEmailSerializer
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-env = environ.Env()
-environ.Env.read_env(env_file=str(BASE_DIR) + '/.env')
+from django.utils.translation import ugettext_lazy as _
+from apps.users.serializers import (UserSerializer,
+                                    AuthenticationEmailSendSerializer,
+                                    AuthenticationResetPasswordEmailSerializer)
 
 
 class RegisterUserView(GenericAPIView):
@@ -31,20 +26,17 @@ class RegisterUserView(GenericAPIView):
 
     @serialize_decorator(UserSerializer)
     def post(self, request):
-        validated_data = request.serializer.validated_data
-
-        user = User.objects.create(
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name'],
-            email=validated_data['email'],
-            username=validated_data['username'],
-            is_superuser=True,
-            is_staff=True
-        )
-        user.set_password(validated_data['password'])
+        user_load = deepcopy(request.data)
+        serializer = UserSerializer(data=user_load)
+        serializer.is_valid()
+        data = serializer.data
+        user = User.objects.create(first_name=data.get('first_name'),
+                                   last_name=data.get('last_name'),
+                                   email=data.get('email'),
+                                   username=data.get('username'))
+        user.set_password(user_load['password'])
         user.save()
-        print(request.user)
-        return Response(UserSerializer(user).data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class PasswordResetViewSet(ViewSet):
@@ -62,20 +54,22 @@ class PasswordResetViewSet(ViewSet):
     def token_email_send(self, request, *args, **kwargs):
         email = request.data.get('email')
         if User.objects.filter(email=email).exists():
-            user = User.objects.filter(email=email)
-            uidb64 = urlsafe_base64_encode(smart_bytes(user))
-            if uidb64:
+            user = User.objects.filter(email=email).first()
+            token, odj = UserToken.objects.update_or_create(user=user, defaults={'token': uuid.uuid4().hex})
+            if token:
                 email = EmailMessage(
-                    env('EMAIL_TOKEN'),
-                    f'your password reset token {uidb64}',
+                    _('Time Manager'),
+                    _(f'your password reset token %(token)s') % {
+                        'token': token.token
+                    },
                     env('EMAIL'),
                     [f'{email}'],
                 )
                 email.fail_silently = False
                 email.send()
-                return Response({'success': 'We have sent you a link to reset your password'})
+                return Response({'success': _('We have sent you a link to reset your password.')}, status=status.HTTP_200_OK)
         else:
-            return Response({'This email doesn t exist'})
+            return Response(_("This email doesn't exist"),status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False,
             methods=['PATCH'],
@@ -85,12 +79,17 @@ class PasswordResetViewSet(ViewSet):
     def password_reset(self, request, *args, **kwargs):
         try:
             user_load = deepcopy(request.data)
-            uidb64 = urlsafe_base64_decode(request.data.get('uidb64')).decode("utf-8")
-            username = re.findall("\s([A-Za-z0-9._%]+)", uidb64)[0]
-            if User.objects.filter(username=username).exists():
-                user = User.objects.get(username=username)
-                user.set_password(user_load.get('password'))
-                user.save()
-                return Response('Password is successful reset ')
+            delete = UserToken()
+            delete.clear_expiring()
+            token = UserToken.objects.filter(token=user_load['token']).first()
+            try:
+                if User.objects.filter(username=token.user).exists():
+                    user = User.objects.filter(username=token.user).first()
+                    user.set_password(user_load['password'])
+                    user.save()
+                    delete.clear_reseted(user_load['token'])
+                return Response(_('Password is successful reset'), status=status.HTTP_200_OK)
+            except AttributeError:
+                return Response(_('Token timed out'), status=status.HTTP_408_REQUEST_TIMEOUT)
         except UnicodeDecodeError:
-            return Response('Invalid uidb64')
+            return Response(_('Invalid token'), status=status.HTTP_400_BAD_REQUEST)

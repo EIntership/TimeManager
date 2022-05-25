@@ -5,7 +5,7 @@ from apps.managers.models import Company, Project, TimeSetting
 class TimeSerializer(ModelSerializer):
     class Meta:
         model = TimeSetting
-        fields = ('day', 'month', 'year', 'role', 'project', 'user')
+        fields = ('day', 'month', 'year', 'project', 'user')
 
 
 class ProjectSerializer(ModelSerializer):

@@ -1,5 +1,12 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from apps.users.models import UserToken
+
+
+class RefreshTokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserToken
+        fields = ("user", "token")
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -19,8 +26,8 @@ class AuthenticationEmailSendSerializer(serializers.ModelSerializer):
 
 
 class AuthenticationResetPasswordEmailSerializer(serializers.ModelSerializer):
-    uidb64 = serializers.CharField(read_only=False)
+    token = serializers.CharField(read_only=False)
 
     class Meta:
         model = User
-        fields = ('uidb64', 'password')
+        fields = ('token', 'password')

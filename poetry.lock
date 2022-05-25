@@ -152,15 +152,14 @@ simplejson = "*"
 
 [[package]]
 name = "djangorestframework"
-version = "3.13.1"
+version = "3.12.4"
 description = "Web APIs for Django, made easy."
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.5"
 
 [package.dependencies]
 django = ">=2.2"
-pytz = "*"
 
 [[package]]
 name = "djangorestframework-simplejwt"
@@ -599,7 +598,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7 <=3.10"
-content-hash = "0a7b83c0648749d4acd55969112ec064af8fc2a6633452e471284f5428f7ce7b"
+content-hash = "3854e4381187964e8d3fa2550585b52aef7936924dc083bdd82d7c0ea68c3ac5"
 
 [metadata.files]
 asgiref = [
@@ -651,8 +650,8 @@ django-rest-swagger = [
     {file = "django_rest_swagger-2.2.0-py2.py3-none-any.whl", hash = "sha256:b039b0288bab4665cd45dc5d16f94b13911bc4ad0ed55f74ad3b90aa31c87c17"},
 ]
 djangorestframework = [
-    {file = "djangorestframework-3.13.1-py3-none-any.whl", hash = "sha256:24c4bf58ed7e85d1fe4ba250ab2da926d263cd57d64b03e8dcef0ac683f8b1aa"},
-    {file = "djangorestframework-3.13.1.tar.gz", hash = "sha256:0c33407ce23acc68eca2a6e46424b008c9c02eceb8cf18581921d0092bc1f2ee"},
+    {file = "djangorestframework-3.12.4-py3-none-any.whl", hash = "sha256:6d1d59f623a5ad0509fe0d6bfe93cbdfe17b8116ebc8eda86d45f6e16e819aaf"},
+    {file = "djangorestframework-3.12.4.tar.gz", hash = "sha256:f747949a8ddac876e879190df194b925c177cdeb725a099db1460872f7c0a7f2"},
 ]
 djangorestframework-simplejwt = [
     {file = "djangorestframework_simplejwt-4.8.0-py3-none-any.whl", hash = "sha256:6f09f97cb015265e85d1d02dc6bfc299c72c231eecbe261c5bee5c6b2867f2b4"},

@@ -20,5 +20,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include("apps.users.urls"), name="authentication_page"),
     path('', include("apps.managers.urls"), name=""),
+    *url_date
 ]
-urlpatterns += url_date
+

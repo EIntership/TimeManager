@@ -4,7 +4,8 @@ from apps.managers.views import CompanyViewSet, ProjectViewSet, TimeManagerViewS
 router = routers.SimpleRouter(trailing_slash=False)
 router.register(r'company', CompanyViewSet, basename='company')
 router.register(r'project', ProjectViewSet, basename='project')
-router.register(r'time', TimeManagerViewSet, basename='time_manager')
+router.register(r'time', TimeManagerViewSet, basename='time')
+
 urlpatterns = [
+ *router.urls
 ]
-urlpatterns += router.urls

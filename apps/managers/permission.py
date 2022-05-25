@@ -8,11 +8,14 @@ class IsManagerOrReadOnly(IsAuthenticated):
         if request.method in permissions.SAFE_METHODS:
             return True
         return bool(request.user.groups.filter(
-            Q(name__startswith='Developer') | Q(name__startswith='Manager')))
+            Q(name='Developer') | Q(name='Manager')))
 
 
 class IsAuthenticatedOrReadOnly(IsAuthenticated):
     def has_permission(self, request, view):
+        print(request.user)
         if request.method in permissions.SAFE_METHODS:
             return True
-        return bool(request.user and request.user.is_staff)
+        if not getattr(request, 'user', None):
+            return False
+        return bool(request.user and request.user.is_active)
