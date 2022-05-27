@@ -56,20 +56,18 @@ class PasswordResetViewSet(ViewSet):
         if User.objects.filter(email=email).exists():
             user = User.objects.filter(email=email).first()
             token, odj = UserToken.objects.update_or_create(user=user, defaults={'token': uuid.uuid4().hex})
-            if token:
-                email = EmailMessage(
-                    _('Time Manager'),
-                    _(f'your password reset token %(token)s') % {
-                        'token': token.token
-                    },
-                    env('EMAIL'),
-                    [f'{email}'],
-                )
-                email.fail_silently = False
-                email.send()
-                return Response({'success': _('We have sent you a link to reset your password.')}, status=status.HTTP_200_OK)
-        else:
-            return Response(_("This email doesn't exist"),status=status.HTTP_400_BAD_REQUEST)
+            email = EmailMessage(
+                _('Time Manager'),
+                _(f'your password reset token %(token)s') % {
+                    'token': token.token
+                },
+                env('EMAIL'),
+                [f'{email}'],
+            )
+            email.fail_silently = False
+            email.send()
+            return Response({'success': _('We have sent you a link to reset your password.')}, status=status.HTTP_200_OK)
+        return Response({'failure': _("This email doesn't exist")}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False,
             methods=['PATCH'],
@@ -77,19 +75,14 @@ class PasswordResetViewSet(ViewSet):
             url_name='password-reset')
     @swagger_auto_schema(request_body=AuthenticationResetPasswordEmailSerializer)
     def password_reset(self, request, *args, **kwargs):
-        try:
-            user_load = deepcopy(request.data)
-            delete = UserToken()
-            delete.clear_expiring()
-            token = UserToken.objects.filter(token=user_load['token']).first()
-            try:
-                if User.objects.filter(username=token.user).exists():
-                    user = User.objects.filter(username=token.user).first()
-                    user.set_password(user_load['password'])
-                    user.save()
-                    delete.clear_reseted(user_load['token'])
-                return Response(_('Password is successful reset'), status=status.HTTP_200_OK)
-            except AttributeError:
-                return Response(_('Token timed out'), status=status.HTTP_408_REQUEST_TIMEOUT)
-        except UnicodeDecodeError:
-            return Response(_('Invalid token'), status=status.HTTP_400_BAD_REQUEST)
+        delete = UserToken()
+        delete.clear_expiring()
+        user_load = deepcopy(request.data)
+        token = UserToken.objects.filter(token=user_load['token']).first()
+        if token is not None and User.objects.filter(username=token.user).exists():
+            user = User.objects.filter(username=token.user).first()
+            user.set_password(user_load['password'])
+            user.save()
+            delete.clear_reseted(user_load['token'])
+            return Response(_('Password is successful reset'), status=status.HTTP_200_OK)
+        return Response(_('Invalid token'), status=status.HTTP_400_BAD_REQUEST)

@@ -13,7 +13,6 @@ class IsManagerOrReadOnly(IsAuthenticated):
 
 class IsAuthenticatedOrReadOnly(IsAuthenticated):
     def has_permission(self, request, view):
-        print(request.user)
         if request.method in permissions.SAFE_METHODS:
             return True
         if not getattr(request, 'user', None):

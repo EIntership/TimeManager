@@ -7,3 +7,6 @@
 /config/__pycache__
 /apps/managers/migrations/__pycache__
 /apps/users/migrations/__pycache__
+/apps/tenant/migrations/__pycache__
+/apps/tenant/__pycache__
+

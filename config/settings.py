@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
+from datetime import timedelta
 from pathlib import Path
 import environ
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -50,7 +51,8 @@ INSTALLED_APPS = [
     'corsheaders',
     # LOCAL APPS
     'apps.users',
-    'apps.managers'
+    'apps.managers',
+    'apps.tenant',
 
 ]
 
@@ -64,6 +66,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'apps.tenant.middleware.CompanyMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -179,3 +182,8 @@ EMAIL_PORT = env('EMAIL_PORT')
 
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(weeks=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}

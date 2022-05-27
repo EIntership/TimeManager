@@ -1,16 +1,18 @@
 from django.contrib.auth.models import User
 from django.db import models
+from apps.tenant.mixins import TenantAwareModelMixin
+import uuid
 
 
 class Company(models.Model):
     name = models.CharField(max_length=255, null=False)
     user = models.OneToOneField(User, null=True, related_name='company', on_delete=models.CASCADE)
+    X_API_Key = models.CharField(default=uuid.uuid4().hex, max_length=32)
 
 
-class Project(models.Model):
+class Project(TenantAwareModelMixin):
     name = models.CharField(max_length=255, null=False)
     member = models.ManyToManyField(User, blank=True, related_name="project", through='managers.TimeSetting')
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="company_projects")
 
 
 class TimeSetting(models.Model):

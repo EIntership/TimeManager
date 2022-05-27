@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, CharField
 from apps.managers.models import Company, Project, TimeSetting
 
 
@@ -13,7 +13,7 @@ class ProjectSerializer(ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ('name', 'members', 'company')
+        fields = ('name', 'members',)
 
 
 class CompanySerializer(ModelSerializer):

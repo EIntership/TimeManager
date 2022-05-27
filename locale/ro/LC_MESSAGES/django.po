@@ -1,0 +1,49 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-26 06:25+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
+"2:1));\n"
+
+#: apps/users/views.py:61
+msgid "Time Manager"
+msgstr "Manager de timp"
+
+#: apps/users/views.py:62
+#, python-format
+msgid "your password reset token %(token)s"
+msgstr "codul de resetare a parolei %(token)s"
+
+#: apps/users/views.py:70
+msgid "We have sent you a link to reset your password."
+msgstr "V-am trimis un link pentru a vă reseta parola."
+
+#: apps/users/views.py:72
+msgid "This email doesn't exist"
+msgstr "Acest e-mail nu există"
+
+#: apps/users/views.py:92
+msgid "Password is successful reset"
+msgstr "Resetarea parolei cu succes"
+
+#: apps/users/views.py:94
+msgid "Token timed out"
+msgstr "Codul a expirat"
+
+#: apps/users/views.py:96
+msgid "Invalid token"
+msgstr "Cod incorect"
