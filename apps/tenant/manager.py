@@ -2,6 +2,24 @@ from django.db import models, IntegrityError
 from apps.tenant.helper import current_company_id, current_company, current_user_id
 
 
+class BasicAwareQuerySet(models.QuerySet):
+    def bulk_create(self, objs, batch_size=None, ignore_conflicts=False):
+        objs = list(objs)
+        for o in objs:
+            o.tenant = current_company()
+
+        super().bulk_create(objs, batch_size, ignore_conflicts)
+
+    def as_manager(cls):
+        manager = CompanyAwareManager.from_queryset(cls)()
+        manager._built_with_as_manager = True
+        return manager
+
+    as_manager.queryset_only = True
+
+    as_manager = classmethod(as_manager)
+
+
 class CompanyAwareManager(models.Manager):
     def get_queryset(self):
         company_id = current_company_id()
@@ -21,7 +39,7 @@ class CompanyAwareManager(models.Manager):
         )
 
 
-class CompanyAwareQuerySet(models.QuerySet):
+class CompanyAwareQuerySet(BasicAwareQuerySet):
     def create(self, **kwargs):
         company_id = current_company_id()
         if company_id and not (kwargs.get('company_id', None) or kwargs.get('company', None)) and self.model.company_id:
@@ -39,22 +57,6 @@ class CompanyAwareQuerySet(models.QuerySet):
         if company_id and not (kwargs.get('company_id', None) or kwargs.get('company', None)) and self.model.company_id:
             kwargs.update({'company_id': current_company_id()})
         return super().update(**kwargs)
-
-    def bulk_create(self, objs, batch_size=None, ignore_conflicts=False):
-        objs = list(objs)
-        for o in objs:
-            o.tenant = current_company()
-
-        super().bulk_create(objs, batch_size, ignore_conflicts)
-
-    def as_manager(cls):
-        manager = CompanyAwareManager.from_queryset(cls)()
-        manager._built_with_as_manager = True
-        return manager
-
-    as_manager.queryset_only = True
-
-    as_manager = classmethod(as_manager)
 
 
 class UserAwareManager(models.Manager):
@@ -75,7 +77,7 @@ class UserAwareManager(models.Manager):
         )
 
 
-class UserAwareQuerySet(models.QuerySet):
+class UserAwareQuerySet(BasicAwareQuerySet):
     def create(self, **kwargs):
         user_id = current_user_id()
         if user_id and not (kwargs.get('user_id', None) or kwargs.get('user', None)) and self.model.user_id:
@@ -96,19 +98,3 @@ class UserAwareQuerySet(models.QuerySet):
         if user_id and not (kwargs.get('user_id', None) or kwargs.get('user', None)) and self.model.user_id:
             kwargs.update({'user_id': current_user_id()})
         return super().update(**kwargs)
-
-    def bulk_create(self, objs, batch_size=None, ignore_conflicts=False):
-        objs = list(objs)
-        for o in objs:
-            o.tenant = current_company()
-
-        super().bulk_create(objs, batch_size, ignore_conflicts)
-
-    def as_manager(cls):
-        manager = CompanyAwareManager.from_queryset(cls)()
-        manager._built_with_as_manager = True
-        return manager
-
-    as_manager.queryset_only = True
-
-    as_manager = classmethod(as_manager)
