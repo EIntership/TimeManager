@@ -14,3 +14,17 @@ def current_company():
 
 def current_company_id():
     return gt(current_company(), 'id')
+
+
+def set_current_user(user):
+    setattr(threadlocal, "user", user)
+
+
+def current_user():
+    return getattr(threadlocal, "user", None)
+
+
+def current_user_id():
+    return gt(current_user(), 'id')
+
+

@@ -20,7 +20,7 @@ django-rest-swagger = "==2.2.0"
 simplejwt = "==2.0.1"
 djangorestframework-simplejwt = "==4.8.0"
 drf-util =  "==1.0.14"
-
+PyJWT = "==2.4.0"
 
 [tool.poetry.dev-dependencies]
 

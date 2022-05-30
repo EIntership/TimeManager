@@ -18,6 +18,7 @@ class ProjectSerializer(ModelSerializer):
 
 class CompanySerializer(ModelSerializer):
     company_project = ProjectSerializer(many=True, read_only=True)
+    user = CharField(read_only=True)
 
     class Meta:
         model = Company
