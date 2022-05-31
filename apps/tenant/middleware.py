@@ -3,7 +3,7 @@ from apps.managers.models import Company
 from apps.tenant.helper import set_current_company, set_current_user
 from rest_framework_simplejwt import authentication
 from django.contrib.auth.models import User
-
+from django.contrib.auth.models import AnonymousUser
 
 class CompanyMiddleware(MiddlewareMixin):
     @staticmethod
@@ -17,6 +17,8 @@ class CompanyMiddleware(MiddlewareMixin):
     def user_request(request):
         auth_user = authentication.JWTAuthentication().authenticate(request)
         user = User.objects.filter(username=auth_user[0]).first() if auth_user else None
+        if user:
+            request.user = user
         set_current_user(user)
 
     def process_request(self, request):

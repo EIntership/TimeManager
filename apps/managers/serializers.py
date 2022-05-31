@@ -1,19 +1,25 @@
 from rest_framework.serializers import ModelSerializer, CharField
 from apps.managers.models import Company, Project, TimeSetting
+from apps.users.serializers import UserSerializer
 
 
 class TimeSerializer(ModelSerializer):
+    user = CharField(read_only=True)
+
     class Meta:
         model = TimeSetting
-        fields = ('day', 'month', 'year', 'project', 'user')
+        fields = ('id', 'user', 'day', 'month', 'year', 'project')
 
 
 class ProjectSerializer(ModelSerializer):
-    members = TimeSerializer(many=True, read_only=True)
+    currencies = TimeSerializer(many=True,
+                                source='timesetting_set.all',
+                                read_only=True,
+                                required=False)
 
     class Meta:
         model = Project
-        fields = ('name', 'members',)
+        fields = ('id', 'name', 'currencies')
 
 
 class CompanySerializer(ModelSerializer):

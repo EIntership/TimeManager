@@ -13,6 +13,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 import environ
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
 
@@ -32,7 +33,6 @@ SECRET_KEY = '#8@0n+p^$@wwpa*40^xe^pg@87!fod3v^lq8t3ul@md@^bu6m&'
 DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -72,16 +72,21 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'config.urls'
 
 SWAGGER_SETTINGS = {
-   'SECURITY_DEFINITIONS': {
-      'Basic': {
+    'SECURITY_DEFINITIONS': {
+        'Basic': {
             'type': 'basic'
-      },
-      'Bearer': {
+        },
+        'Bearer': {
             'type': 'apiKey',
             'name': 'Authorization',
             'in': 'header'
-      }
-   }
+        },
+        'X-API-Key': {
+            'type': 'apiKey',
+            'name': 'X-API-Key',
+            'in': 'header'
+        }
+    }
 }
 
 TEMPLATES = [
@@ -101,7 +106,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -151,7 +155,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
@@ -178,7 +181,6 @@ EMAIL_HOST = env('EMAIL_HOST')
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = env('EMAIL_PORT')
-
 
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False

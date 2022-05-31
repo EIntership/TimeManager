@@ -16,11 +16,13 @@ from django.utils.translation import ugettext_lazy as _
 from apps.users.serializers import (UserSerializer,
                                     AuthenticationEmailSendSerializer,
                                     AuthenticationResetPasswordEmailSerializer)
+from apps.managers.views import BasicModelViewSet
+from rest_framework.permissions import IsAdminUser
+from apps.managers.permission import IsManagerOrDeveloperOrReadOnly, IsAuthenticatedOrReadOnly,IsAdmin
 
 
 class RegisterUserView(GenericAPIView):
     serializer_class = UserSerializer
-
     permission_classes = (AllowAny,)
     authentication_classes = ()
 
@@ -86,3 +88,11 @@ class PasswordResetViewSet(ViewSet):
             delete.clear_reseted(user_load['token'])
             return Response(_('Password is successful reset'), status=status.HTTP_200_OK)
         return Response(_('Invalid token'), status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserViewSet(BasicModelViewSet):
+    http_method_names = ('get',)
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    permission_classes = [IsAdmin]
+    authentication_classes = ()
