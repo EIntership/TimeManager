@@ -5,6 +5,7 @@ from faker import Faker
 from abc import ABC
 import re
 from drf_util.utils import gt
+from drf_util.tests import BaseTestCase, CRUDTestCase
 
 
 # Create your tests here.
@@ -78,8 +79,24 @@ class AbstractClass(ABC):
         return data
 
 
-class ManagerTest(APITestCase, AbstractClass):
+class ManagerCompanyTest(APITestCase, AbstractClass):
+    endpoint = '/company'
+
     def setUp(self) -> None:
         user_test1 = User.objects.create(username='admin', password='admin')
         self.object = AbstractClass(requests.get('http://127.0.0.1:8000/?format=openapi'))
         self.client.force_authenticate(user=user_test1)
+
+    def authenticate_client(self, user=None):
+        self.user_client = user or getattr(self, '_user', None) or User.objects.first()
+        # self.user_client = user or getattr(self, '_user', None) or User.objects.filter(account__payment_account_code__isnull=False).first()
+        self.client.force_authenticate(self.user_client)
+
+    def test_task_get_comment(self):
+        json_post_response = self.object.execution_post_method(path=f'{self.endpoint}', client=self.client)
+        json_get_response = self.object.execution_get_method(path=f'{self.endpoint}', client=self.client)
+        self.assertEqual(json_post_response, json_get_response[0])
+        self.assertIsNotNone(json_post_response.get('name'))
+        self.assertIsNotNone(json_post_response.get('id'))
+        self.assertIsNone(json_post_response.get('user'))
+
