@@ -18,7 +18,7 @@ from apps.users.serializers import (UserSerializer,
                                     AuthenticationResetPasswordEmailSerializer)
 from apps.managers.views import BasicModelViewSet
 from rest_framework.permissions import IsAdminUser
-from apps.managers.permission import IsManagerOrDeveloperOrReadOnly, IsAuthenticatedOrReadOnly,IsAdmin
+from apps.managers.permission import IsManagerOrDeveloperOrReadOnly, IsAuthenticatedOrReadOnly, IsAdmin
 
 
 class RegisterUserView(GenericAPIView):
@@ -95,4 +95,3 @@ class UserViewSet(BasicModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = [IsAdmin]
-    authentication_classes = ()

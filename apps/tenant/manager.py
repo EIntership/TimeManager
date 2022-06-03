@@ -23,7 +23,6 @@ class BasicAwareQuerySet(models.QuerySet):
 class CompanyAwareManager(models.Manager):
     def get_queryset(self):
         company_id = current_company_id()
-
         if not company_id:
             return self._queryset_class(self.model)
 
@@ -62,12 +61,9 @@ class CompanyAwareQuerySet(BasicAwareQuerySet):
 class UserAwareManager(models.Manager):
     def get_queryset(self):
         user_id = current_user_id()
+
         if not user_id:
             return self._queryset_class(self.model)
-
-        # If the manager was built from a queryset using
-        # SomeQuerySet.as_manager() or SomeManager.from_queryset(),
-        # we want to use that queryset instead of TenantAwareQuerySet.
 
         if self._queryset_class != models.QuerySet:
             return super().get_queryset().filter(user__id=user_id)

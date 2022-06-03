@@ -11,7 +11,12 @@ class Company(UserAwareModelMixin):
 
 class Project(CompanyAwareModelMixin):
     name = models.CharField(max_length=255, null=False)
-    users = models.ManyToManyField(User, through='managers.TimeSetting', related_name='user', default=list)
+    time = models.ManyToManyField(User, through='managers.TimeSetting', related_name='project_time', default=list)
+
+
+class ProjectUsers(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=False)
 
 
 class TimeSetting(TimeUserAwareModelMixin):

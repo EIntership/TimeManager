@@ -1,6 +1,21 @@
+from django.contrib.auth.models import AnonymousUser
 from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
+from apps.tenant.helper import current_company
+
+
+class IsCompanyOwner(IsAuthenticated):
+    def has_permission(self, request, view):
+        user = request.user
+        company = current_company()
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if isinstance(user, AnonymousUser):
+            return False
+        if user == company.user:
+            return True
+        return False
 
 
 class IsManagerOrDeveloperOrReadOnly(IsAuthenticated):
@@ -22,5 +37,4 @@ class IsAuthenticatedOrReadOnly(IsAuthenticated):
 
 class IsAdmin(IsAuthenticated):
     def has_permission(self, request, view):
-        print(request.user)
         return bool(request.user and request.user.is_staff)

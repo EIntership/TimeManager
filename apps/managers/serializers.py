@@ -1,6 +1,6 @@
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import ModelSerializer, CharField
-from apps.managers.models import Company, Project, TimeSetting
-from apps.users.serializers import UserSerializer
+from apps.managers.models import Company, Project, TimeSetting, ProjectUsers
 
 
 class TimeSerializer(ModelSerializer):
@@ -10,16 +10,28 @@ class TimeSerializer(ModelSerializer):
         model = TimeSetting
         fields = ('id', 'user', 'day', 'month', 'year', 'project')
 
+    def create(self, validated_data):
+        request = self.context['request']
+        if not ProjectUsers.objects.filter(project_id=request.data['project'], user_id=request.user.id):
+            raise PermissionDenied
+        return super(TimeSerializer, self).create(validated_data)
+
+
+class ProjectUserSerializer(ModelSerializer):
+    class Meta:
+        model = ProjectUsers
+        fields = '__all__'
+
 
 class ProjectSerializer(ModelSerializer):
-    currencies = TimeSerializer(many=True,
-                                source='timesetting_set.all',
-                                read_only=True,
-                                required=False)
+    users = TimeSerializer(many=True,
+                           source='timesetting_set',
+                           read_only=True,
+                           required=False)
 
     class Meta:
         model = Project
-        fields = ('id', 'name', 'currencies')
+        fields = ('id', 'name', 'users')
 
 
 class CompanySerializer(ModelSerializer):

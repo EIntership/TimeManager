@@ -3,18 +3,8 @@ from django.contrib.auth.models import User
 from apps.tenant.manager import CompanyAwareManager, UserAwareManager
 
 
-# class BaseAwareModelMixin(models.Model):
-#     """
-#         An abstract base class model that provides a foreign key to a tenant
-#     """
-#     unscoped = models.Manager()
-#
-#     class Meta:
-#         abstract = True
-
-
 class CompanyAwareModelMixin(models.Model):
-    company = models.ForeignKey("managers.Company", models.CASCADE)
+    company = models.ForeignKey("managers.Company", models.CASCADE, blank=True)
     objects = CompanyAwareManager()
     unscoped = models.Manager()
 
@@ -23,7 +13,7 @@ class CompanyAwareModelMixin(models.Model):
 
 
 class UserAwareModelMixin(models.Model):
-    user = models.OneToOneField(User, models.CASCADE, null=True)
+    user = models.OneToOneField(User, models.CASCADE, blank=True, null=True)
     objects = UserAwareManager()
     unscoped = models.Manager()
 
